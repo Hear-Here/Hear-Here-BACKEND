@@ -33,6 +33,17 @@ public class PostController {
         return ResponseEntity.ok(new CreatePost(newPostId));
     }
 
+    /**
+     * 게시물 조회
+     */
+    @Operation(summary = "게시물 상세조회", description = "게시물 상세조회")
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostInfo> findPost(@PathVariable Long postId, @RequestParam Double latitude,
+                                             @RequestParam Double longitude){
+        PostInfo postInfo = postService.findPostById(postId, latitude, longitude);
+        return ResponseEntity.ok().body(postInfo);
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());
