@@ -15,20 +15,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.sw.hearhere.response.BaseResponseStatus.NOT_FOUND_POST;
-import static com.sw.hearhere.response.BaseResponseStatus.NOT_FOUND_USER;
+import static com.sw.hearhere.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PostService {
 
+    private static final int EARTH_RADIUS = 6371; //km
     private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final PostRepository postRepository;
     private final HeartRepository heartRepository;
-
-    private static final int EARTH_RADIUS = 6371; //km
 
     public Long createPost(PostReqDto.UploadPost uploadPost) {
         User user = userRepository.findById(SecurityUtil.getLoginUserId())
@@ -54,22 +52,33 @@ public class PostService {
     public PostResDto.PostInfo findPostById(Long postId, Double latitude, Double longitude) {
         User user = userRepository.findById(SecurityUtil.getLoginUserId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-        Post post = postRepository.findById(postId).orElseThrow(()-> new BaseException(NOT_FOUND_POST));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(NOT_FOUND_POST));
         int distance = calculateDistance(latitude, longitude, post.getLatitude(), post.getLongitude());
         boolean isHearted = heartRepository.existsByPostAndUser(post, user);
-        boolean isWriter = false;
-        if(post.getUser()==user){
-            isWriter = true;
-        }
+        boolean isWriter = post.getUser() == user;
         return PostResDto.PostInfo.fromEntity(post, distance, isHearted, isWriter);
+    }
+
+    public Long deletePost(Long postId) {
+        Long userId = SecurityUtil.getLoginUserId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        Post post = postRepository.findById(postId).orElseThrow(()-> new BaseException(NOT_FOUND_POST));
+        if(post.getUser()!=user){
+            throw new BaseException(IS_NOT_WRITER);
+        }
+        postRepository.delete(post);
+        return postId;
     }
 
     private int calculateDistance(double userLat, double userLon, double postLat, double postLon) {
         double dLat = Math.toRadians(postLat - userLat);
         double dLon = Math.toRadians(postLon - userLon);
 
-        double a = Math.sin(dLat/2)* Math.sin(dLat/2)+ Math.cos(Math.toRadians(userLat))* Math.cos(Math.toRadians(postLat))* Math.sin(dLon/2)* Math.sin(dLon/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return (int)Math.round(EARTH_RADIUS* c * 1000); // Distance in m
+        double a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(userLat)) * Math.cos(Math.toRadians(postLat)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return (int) Math.round(EARTH_RADIUS * c * 1000); // Distance in m
     }
+
+
 }

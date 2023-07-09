@@ -44,6 +44,16 @@ public class PostController {
         return ResponseEntity.ok().body(postInfo);
     }
 
+    /**
+     * 게시물 삭제
+     */
+    @Operation(summary = "게시물 삭제", description = "게시물 삭제")
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<DeletePost> deletePost(@PathVariable Long postId){
+        Long deletedPostId = postService.deletePost(postId);
+        return ResponseEntity.ok(new DeletePost(deletedPostId));
+    }
+
     @ExceptionHandler(BaseException.class)
     public BaseResponse<String> handleBaseException(BaseException e) {
         log.info(e.getStatus().toString());

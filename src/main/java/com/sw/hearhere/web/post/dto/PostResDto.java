@@ -80,4 +80,13 @@ public class PostResDto {
         }
     }
 
+    @Schema(title = "게시물 삭제 Res")
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeletePost {
+        @Schema(description = "삭제된 게시물의 postId", example = "12")
+        private Long postId;
+    }
+
 }
