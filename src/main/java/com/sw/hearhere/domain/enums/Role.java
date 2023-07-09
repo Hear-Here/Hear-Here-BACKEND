@@ -1,13 +1,25 @@
 package com.sw.hearhere.domain.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
-@AllArgsConstructor
-public enum Role {
+public enum Role implements GrantedAuthority {
+    USER("ROLE_USER", "유저"),
+    ADMIN("ROLE_ADMIN", "관리자");
 
-    USER("ROLE_USER"), ADMIN("ROLE_ADMIN"), ANOYMOUS("ROLE_ANOYMOUS");
+    private final String authority;
+    private final String description;
 
-    private String role;
+    Role(String authority, String description) {
+        this.authority = authority;
+        this.description = description;
+    }
+
+    @Override
+    public String getAuthority() {
+        return authority;
+    }
+
 }
+
