@@ -7,6 +7,8 @@ import com.sw.hearhere.domain.enums.Role;
 import com.sw.hearhere.domain.repository.UserRepository;
 import com.sw.hearhere.jwt.JwtTokenProvider;
 import com.sw.hearhere.jwt.TokensDto;
+import com.sw.hearhere.response.BaseException;
+import com.sw.hearhere.utils.SecurityUtil;
 import com.sw.hearhere.web.user.dto.UserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.sw.hearhere.response.BaseResponseStatus.NOT_FOUND_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -54,5 +58,12 @@ public class UserService {
 
         // 3. 인증 정보를 바탕으로 JWT 토큰 생성
         return jwtTokenProvider.generateTokens(authentication);
+    }
+
+    public void updateNickname(String updateNickname) {
+        Long userId = SecurityUtil.getLoginUserId();
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        user.updateNickname(updateNickname);
+        userRepository.save(user);
     }
 }
