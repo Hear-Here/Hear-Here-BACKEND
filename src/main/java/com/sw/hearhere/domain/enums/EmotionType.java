@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.util.Locale;
 
-public enum EmotionType {
+public enum EmotionType implements SearchType{
     SMILE,
     SOSO,
     SAD,

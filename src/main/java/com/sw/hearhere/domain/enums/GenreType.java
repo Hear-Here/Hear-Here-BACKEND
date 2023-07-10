@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Locale;
 
 
-public enum GenreType {
+public enum GenreType implements SearchType{
     BALLAD("발라드"),
     DANCE("댄스"),
     HIPHOP("랩/힙합"),
