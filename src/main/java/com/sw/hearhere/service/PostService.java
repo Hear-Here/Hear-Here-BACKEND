@@ -99,4 +99,16 @@ public class PostService {
         }
         return postInfoList;
     }
+
+    public void updatePostContent(Long postId, String content) {
+        User user = userRepository.findById(SecurityUtil.getLoginUserId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(NOT_FOUND_POST));
+        if(post.getUser()==user){
+            post.updateContent(content);
+            postRepository.save(post);
+        }else{
+            throw new BaseException(IS_NOT_WRITER);
+        }
+    }
 }

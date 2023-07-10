@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import static com.sw.hearhere.web.post.dto.PostReqDto.UploadPost;
+import static com.sw.hearhere.web.post.dto.PostReqDto.*;
 import static com.sw.hearhere.web.post.dto.PostResDto.*;
 
 
@@ -42,9 +42,9 @@ public class PostController {
      */
     @Operation(summary = "게시물 상세조회", description = "게시물 상세조회")
     @GetMapping("/{postId}")
-    public ResponseEntity<PostInfo> findPost(@Parameter(description = "postId")@PathVariable(value = "postId") Long postId,
-                                             @Parameter(description = "위도")@RequestParam(value = "latitude") Double latitude,
-                                             @Parameter(description = "경도")@RequestParam(value = "longitude") Double longitude) {
+    public ResponseEntity<PostInfo> findPost(@Parameter(description = "postId") @PathVariable(value = "postId") Long postId,
+                                             @Parameter(description = "위도") @RequestParam(value = "latitude") Double latitude,
+                                             @Parameter(description = "경도") @RequestParam(value = "longitude") Double longitude) {
         PostInfo postInfo = postService.findPostById(postId, latitude, longitude);
         return ResponseEntity.ok().body(postInfo);
     }
@@ -65,11 +65,18 @@ public class PostController {
     @Operation(summary = "게시물 리스트 조회 - 지도", description = "게시물 리스트 조회(필터링: 장르, 듣는사람, 날씨, 감정)")
     @GetMapping("/list-map")
     public ResponseEntity<List<PostInfo>> postListForMap(
-            @Parameter(description = "위도")@RequestParam(value = "latitude", required = false) Double latitude
-            , @Parameter(description = "경도")@RequestParam(value = "longitude", required = false) Double longitude
+            @Parameter(description = "위도") @RequestParam(value = "latitude", required = false) Double latitude
+            , @Parameter(description = "경도") @RequestParam(value = "longitude", required = false) Double longitude
             , @RequestParam(required = false) Map<String, String> filterMap) {
         List<PostInfo> postInfoList = postService.postListForMap(latitude, longitude, filterMap);
         return ResponseEntity.ok(postInfoList);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<String> updatePostContent(@RequestBody UpdatePostContent updateContent,
+                                                    @Parameter(description = "게시물Id") @PathVariable(value = "postId") Long postId) {
+        postService.updatePostContent(postId, updateContent.getContent());
+        return ResponseEntity.ok().body("Success");
     }
 
     @ExceptionHandler(BaseException.class)

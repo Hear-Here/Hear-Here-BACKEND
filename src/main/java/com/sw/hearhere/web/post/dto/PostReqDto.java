@@ -42,4 +42,12 @@ public class PostReqDto {
         @Schema(description = "위도", example = "37.566667")
         private Double latitude;
     }
+
+    @Schema(title = "게시물 내용 수정 Req")
+    @NoArgsConstructor
+    @Getter
+    public static class UpdatePostContent{
+        @Schema(description = "한줄 평", example = "요마 하아아압~")
+        private String content;
+    }
 }
