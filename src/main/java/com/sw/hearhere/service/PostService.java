@@ -10,12 +10,16 @@ import com.sw.hearhere.domain.repository.UserRepository;
 import com.sw.hearhere.response.BaseException;
 import com.sw.hearhere.utils.SecurityUtil;
 import com.sw.hearhere.web.post.dto.PostReqDto;
-import com.sw.hearhere.web.post.dto.PostResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import static com.sw.hearhere.response.BaseResponseStatus.*;
+import static com.sw.hearhere.web.post.dto.PostResDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,14 +53,14 @@ public class PostService {
         return postRepository.save(post).getId();
     }
 
-    public PostResDto.PostInfo findPostById(Long postId, Double latitude, Double longitude) {
+    public PostInfo findPostById(Long postId, Double latitude, Double longitude) {
         User user = userRepository.findById(SecurityUtil.getLoginUserId())
                 .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
         Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(NOT_FOUND_POST));
         int distance = calculateDistance(latitude, longitude, post.getLatitude(), post.getLongitude());
         boolean isHearted = heartRepository.existsByPostAndUser(post, user);
         boolean isWriter = post.getUser() == user;
-        return PostResDto.PostInfo.fromEntity(post, distance, isHearted, isWriter);
+        return PostInfo.fromEntity(post, distance, isHearted, isWriter);
     }
 
     public Long deletePost(Long postId) {
@@ -80,5 +84,19 @@ public class PostService {
         return (int) Math.round(EARTH_RADIUS * c * 1000); // Distance in m
     }
 
-
+    public List<PostInfo> postListForMap (Double latitude, Double longitude, Map<String, String> filter) {
+        User user = userRepository.findById(SecurityUtil.getLoginUserId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        List<Post> postList = postRepository.findAllPostIn500mWithFilter(latitude, longitude, filter);
+        List<PostInfo> postInfoList = new ArrayList<>();
+        for (Post  post : postList) {
+            int distance = calculateDistance(latitude, longitude
+                    , post.getLatitude(), post.getLongitude());
+            boolean isHearted = heartRepository.existsByPostAndUser(post, user);
+            boolean isWriter = post.getUser() == user;
+            PostInfo postInfo = PostInfo.fromEntity(post, distance, isHearted, isWriter);
+            postInfoList.add(postInfo);
+        }
+        return postInfoList;
+    }
 }

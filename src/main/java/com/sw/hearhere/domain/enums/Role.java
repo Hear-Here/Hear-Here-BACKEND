@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
 @Getter
-public enum Role implements GrantedAuthority {
+public enum Role implements GrantedAuthority{
     USER("ROLE_USER", "유저"),
     ADMIN("ROLE_ADMIN", "관리자");
 
