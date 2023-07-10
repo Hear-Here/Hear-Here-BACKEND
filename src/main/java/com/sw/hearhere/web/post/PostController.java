@@ -72,11 +72,20 @@ public class PostController {
         return ResponseEntity.ok(postInfoList);
     }
 
+    @Operation(summary = "게시물 한줄평 수정", description = "게시물 한줄평 수정")
     @PatchMapping("/{postId}")
     public ResponseEntity<String> updatePostContent(@RequestBody UpdatePostContent updateContent,
                                                     @Parameter(description = "게시물Id") @PathVariable(value = "postId") Long postId) {
         postService.updatePostContent(postId, updateContent.getContent());
         return ResponseEntity.ok().body("Success");
+    }
+
+    @Operation(summary = "내가 쓴 게시물 리스트 조회", description = "내가 쓴 게시물 리스트 조회")
+    @GetMapping("/list/my")
+    public ResponseEntity<List<PostInfo>> myPost(@RequestParam Double latitude,
+                                                 @RequestParam Double longitude){
+        List<PostInfo> postList = postService.myPostList(latitude, longitude);
+        return ResponseEntity.ok().body(postList);
     }
 
     @ExceptionHandler(BaseException.class)

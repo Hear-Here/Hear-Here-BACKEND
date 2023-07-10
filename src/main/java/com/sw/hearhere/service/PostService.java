@@ -111,4 +111,19 @@ public class PostService {
             throw new BaseException(IS_NOT_WRITER);
         }
     }
+
+    public List<PostInfo> myPostList(Double latitude, Double longitude) {
+        User user = userRepository.findById(SecurityUtil.getLoginUserId())
+                .orElseThrow(() -> new BaseException(NOT_FOUND_USER));
+        List<Post> postList = postRepository.findAllByUser(user);
+        List<PostInfo> postInfoList = new ArrayList<>();
+        for (Post  post : postList) {
+            int distance = calculateDistance(latitude, longitude, post.getLatitude(), post.getLongitude());
+            boolean isHearted = heartRepository.existsByPostAndUser(post, user);
+            boolean isWriter = post.getUser() == user;
+            PostInfo postInfo = PostInfo.fromEntity(post, distance, isHearted, isWriter);
+            postInfoList.add(postInfo);
+        }
+        return postInfoList;
+    }
 }
