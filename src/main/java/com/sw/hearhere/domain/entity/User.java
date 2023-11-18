@@ -18,6 +18,8 @@ public class User {
     @Column(unique = true)
     private Long providerId;
 
+    private String pwd;
+
     @Column(unique = true)
     private String email;
 

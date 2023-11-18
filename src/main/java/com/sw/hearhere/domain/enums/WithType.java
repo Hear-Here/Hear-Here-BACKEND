@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.util.Locale;
 
-public enum WithType {
+public enum WithType implements SearchType{
     ALONE("나 혼자"),
     FRIEND("친구"),
     COUPLE("연인"),

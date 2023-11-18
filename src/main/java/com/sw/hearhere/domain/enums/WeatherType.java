@@ -5,7 +5,7 @@ import lombok.Getter;
 
 import java.util.Locale;
 
-public enum WeatherType {
+public enum WeatherType implements SearchType{
     SUNNY("맑음"),
     NORMAL("보통"),
     CLOUDY("흐림"),
